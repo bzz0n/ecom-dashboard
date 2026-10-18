@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E-Commerce Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f6f7f9;
+    --card: #ffffff;
+    --text: #1a1d23;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --accent: #2563eb;
+    --good: #059669;
+    --bad: #dc2626;
+    --c1: #2563eb; --c2: #0891b2; --c3: #7c3aed; --c4: #db2777; --c5: #ea580c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1115; --card: #181b21; --text: #e8eaed; --muted: #9aa1ac; --border: #2a2f38;
+      --accent: #60a5fa; --good: #34d399; --bad: #f87171;
+      --c1: #60a5fa; --c2: #22d3ee; --c3: #a78bfa; --c4: #f472b6; --c5: #fb923c;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0f1115; --card: #181b21; --text: #e8eaed; --muted: #9aa1ac; --border: #2a2f38;
+    --accent: #60a5fa; --good: #34d399; --bad: #f87171;
+    --c1: #60a5fa; --c2: #22d3ee; --c3: #a78bfa; --c4: #f472b6; --c5: #fb923c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--text);
+    font-family: Inter, system-ui, sans-serif; font-size: 14px; line-height: 1.5;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 24px 16px 48px; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; justify-content: space-between; margin-bottom: 20px; }
+  h1 { font-size: 22px; margin: 0; }
+  .sub { color: var(--muted); margin: 2px 0 0; }
+  .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+  select {
+    font: inherit; color: var(--text); background: var(--card);
+    border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px;
+  }
+  .grid { display: grid; gap: 16px; }
+  .kpis { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); margin-bottom: 16px; }
+  .charts { grid-template-columns: 2fr 1fr; margin-bottom: 16px; }
+  .charts2 { grid-template-columns: 1fr 1fr; }
+  @media (max-width: 800px) { .charts, .charts2 { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; min-width: 0; }
+  .card h2 { font-size: 14px; font-weight: 600; margin: 0 0 12px; }
+  .kpi .label { color: var(--muted); font-size: 13px; }
+  .kpi .value { font-size: 26px; font-weight: 700; margin: 4px 0; font-variant-numeric: tabular-nums; }
+  .kpi .delta { font-size: 13px; font-weight: 500; }
+  .up { color: var(--good); } .down { color: var(--bad); }
+  .chart-box { position: relative; height: 280px; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 12px; }
+  td.num, th.num { text-align: right; }
+  .note { color: var(--muted); font-size: 12px; margin-top: 24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>E-Commerce Dashboard</h1>
+      <p class="sub">Beispiel-Onlineshop · Beispieldaten</p>
+    </div>
+    <div class="filters">
+      <select id="year" aria-label="Jahr"></select>
+      <select id="category" aria-label="Kategorie"></select>
+    </div>
+  </header>
+
+  <section class="grid kpis">
+    <div class="card kpi"><div class="label">Umsatz</div><div class="value" id="k-rev"></div><div class="delta" id="d-rev"></div></div>
+    <div class="card kpi"><div class="label">Bestellungen</div><div class="value" id="k-ord"></div><div class="delta" id="d-ord"></div></div>
+    <div class="card kpi"><div class="label">Ø Warenkorb</div><div class="value" id="k-aov"></div><div class="delta" id="d-aov"></div></div>
+    <div class="card kpi"><div class="label">Retourenquote</div><div class="value" id="k-ret"></div><div class="delta" id="d-ret"></div></div>
+  </section>
+
+  <section class="grid charts">
+    <div class="card"><h2>Umsatz pro Monat</h2><div class="chart-box"><canvas id="c-month"></canvas></div></div>
+    <div class="card"><h2>Umsatz nach Kanal</h2><div class="chart-box"><canvas id="c-channel"></canvas></div></div>
+  </section>
+
+  <section class="grid charts2">
+    <div class="card"><h2>Umsatz nach Kategorie</h2><div class="chart-box"><canvas id="c-cat"></canvas></div></div>
+    <div class="card"><h2>Top 8 Produkte</h2>
+      <table>
+        <thead><tr><th>Produkt</th><th class="num">Stück</th><th class="num">Umsatz</th></tr></thead>
+        <tbody id="top"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="note">Alle Zahlen sind zufällig erzeugte Beispieldaten. Vergleich jeweils zum Vorjahr.</p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
